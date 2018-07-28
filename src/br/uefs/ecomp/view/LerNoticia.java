@@ -1,23 +1,25 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package br.uefs.ecomp.view;
 
+import br.uefs.ecomp.controller.Controller;
+import br.uefs.ecomp.model.Noticia;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
-/**
- *
- * @author Eduardo
- */
-public class Noticia extends javax.swing.JDialog {
-
-    /**
-     * Creates new form Noticia
-     */
-    public Noticia(java.awt.Frame parent, boolean modal) {
+//@author Eduardo
+public class LerNoticia extends javax.swing.JDialog {
+    private Controller c;
+    private Noticia n;
+            
+    public LerNoticia(java.awt.Frame parent, boolean modal, Controller c, Noticia n) {
+        super(parent, modal);
+        initComponents();
+        this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/logonews.png")).getImage());
+        this.c = c;
+        this.n = n;
+        this.exibeNoticia();
+    }
+    
+    public LerNoticia(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
     }
@@ -33,10 +35,10 @@ public class Noticia extends javax.swing.JDialog {
 
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        titulo = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
-        avaliacao = new javax.swing.JButton();
+        texto = new javax.swing.JTextArea();
+        setAvaliacao = new javax.swing.JButton();
         sliderAvaliacao = new javax.swing.JSlider();
         jLabel3 = new javax.swing.JLabel();
         estrelaAvaliacao = new javax.swing.JLabel();
@@ -49,21 +51,21 @@ public class Noticia extends javax.swing.JDialog {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/logonews.png"))); // NOI18N
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jLabel2.setText("Titulo da Noticia");
+        titulo.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        titulo.setText("Titulo da Noticia");
 
-        jTextArea1.setEditable(false);
-        jTextArea1.setColumns(20);
-        jTextArea1.setLineWrap(true);
-        jTextArea1.setRows(5);
-        jTextArea1.setWrapStyleWord(true);
-        jScrollPane1.setViewportView(jTextArea1);
+        texto.setEditable(false);
+        texto.setColumns(20);
+        texto.setLineWrap(true);
+        texto.setRows(5);
+        texto.setWrapStyleWord(true);
+        jScrollPane1.setViewportView(texto);
 
-        avaliacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/estrela2.png"))); // NOI18N
-        avaliacao.setText("(4,5)");
-        avaliacao.addActionListener(new java.awt.event.ActionListener() {
+        setAvaliacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/estrela2.png"))); // NOI18N
+        setAvaliacao.setText("(0)");
+        setAvaliacao.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                avaliacaoActionPerformed(evt);
+                setAvaliacaoActionPerformed(evt);
             }
         });
 
@@ -95,10 +97,10 @@ public class Noticia extends javax.swing.JDialog {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(10, 10, 10)
-                                .addComponent(jLabel2))
+                                .addComponent(titulo))
                             .addComponent(jLabel1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(avaliacao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(setAvaliacao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jScrollPane1))
@@ -124,8 +126,8 @@ public class Noticia extends javax.swing.JDialog {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel2))
-                    .addComponent(avaliacao))
+                        .addComponent(titulo))
+                    .addComponent(setAvaliacao))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 322, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -160,11 +162,18 @@ public class Noticia extends javax.swing.JDialog {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void avaliacaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_avaliacaoActionPerformed
+    private void setAvaliacaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setAvaliacaoActionPerformed
         System.out.println(estrelaAvaliacao.getIcon());
         //JOptionPane.showInputDialog(this, "Defina uma nota de avaliação!", "Avaliação!", WIDTH);
-    }//GEN-LAST:event_avaliacaoActionPerformed
+    }//GEN-LAST:event_setAvaliacaoActionPerformed
 
+    //------------------------------------------------------------------------//
+    public void exibeNoticia(){
+        titulo.setText(n.getTitulo());
+        texto.setText(n.getTexto());
+        setAvaliacao.setText(""+n.getNota());
+    }
+    //------------------------------------------------------------------------//
     private void sliderAvaliacaoStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sliderAvaliacaoStateChanged
         if(sliderAvaliacao.getValue() == 1){
             estrelaAvaliacao.setText("1");
@@ -201,20 +210,21 @@ public class Noticia extends javax.swing.JDialog {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Noticia.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LerNoticia.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Noticia.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LerNoticia.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Noticia.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LerNoticia.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Noticia.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LerNoticia.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                Noticia dialog = new Noticia(new javax.swing.JFrame(), true);
+                LerNoticia dialog = new LerNoticia(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
@@ -227,15 +237,15 @@ public class Noticia extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton avaliacao;
     private javax.swing.JLabel estrelaAvaliacao;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JButton setAvaliacao;
     private javax.swing.JSlider sliderAvaliacao;
+    private javax.swing.JTextArea texto;
+    private javax.swing.JLabel titulo;
     // End of variables declaration//GEN-END:variables
 }
