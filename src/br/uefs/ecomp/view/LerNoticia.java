@@ -4,6 +4,8 @@ import br.uefs.ecomp.controller.Controller;
 import br.uefs.ecomp.model.Noticia;
 import java.awt.Color;
 import java.text.DecimalFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 //@author Eduardo
@@ -183,7 +185,11 @@ public class LerNoticia extends javax.swing.JDialog {
             qtdNota = Integer.parseInt((String) JOptionPane.showInputDialog(this, "Por favor, insira um valor maior que 0", "Avaliação", WIDTH, new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/e5.png")), null, null));
         }
         
-        c.setAvaliacao(this.idNoticia, nota, qtdNota);
+        try {
+            c.setAvaliacao(this.idNoticia, nota, qtdNota);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(LerNoticia.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_setAvaliacaoActionPerformed
 
     //------------------------------------------------------------------------//
@@ -202,6 +208,8 @@ public class LerNoticia extends javax.swing.JDialog {
             alert.setText("Esta notícia foi listada como Fake News em nossa base de dados!");
             alert.setForeground(Color.red);
             alert.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/error.png")));
+            avalia.setEnabled(false);
+            setAvaliacao.setEnabled(false);
         }
         
         titulo.setText(n.getTitulo());
@@ -241,7 +249,11 @@ public class LerNoticia extends javax.swing.JDialog {
     //Função para os usuários avaliarem as noticias;
     private void avaliaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_avaliaActionPerformed
         int nota = sliderAvaliacao.getValue();
-        c.avaliacao(nota, this.idNoticia);
+        try {
+            c.avaliacao(nota, this.idNoticia);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(LerNoticia.class.getName()).log(Level.SEVERE, null, ex);
+        }
         avalia.setEnabled(false);
     }//GEN-LAST:event_avaliaActionPerformed
 

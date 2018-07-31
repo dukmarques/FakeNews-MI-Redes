@@ -64,6 +64,10 @@ public class Controller {
         return noticias;
     }
     
+    public LinkedList<Noticia> getFakeNews(){
+        return this.fakeNews;
+    }
+    
     public void avaliacao(int nota, int idNoticia) throws InterruptedException{
         Noticia n = getNoticia(idNoticia); //Pega a instancia da noticia na lista;
         n.setNota(n.getNota()+ nota); //Soma a nota dada com as notas já recebidas pela noticia;
@@ -200,7 +204,7 @@ public class Controller {
             
             //Se o protocolo for 0, significa que um novo servidor entrou no multicast, então todos servidores atualizam
             //sua lista e o adm da rodada responde o multicast para que o novo servidor possa atualizar sua lista igualmente;
-            if (p.getProtocolo() == 0 && this.adm.equals(this.nomeLocal) ) {
+            if (p.getProtocolo() == 0) {
                 if (this.adm == null) { //Verifica se o adm é nulo, caso o servidor seja o primeiro a iniciar o multicast;
                     adm = this.nomeLocal;
                     System.out.println("Adm: " + this.adm);
@@ -316,11 +320,13 @@ public class Controller {
         this.suspeitas.removeFirst(); //Remove a noticia da lista de suspeitas;
         
         //Remove-se da lista de candidataos a adm;
-        this.candidatos.removeFirst();
-        this.adm = candidatos.getFirst();
-        this.fimMandato = true;
-        //Comunica aos demais a conclusão do seu mandato;
-        p.setProtocolo(3);
+        if (!this.candidatos.isEmpty()) {
+            this.candidatos.removeFirst();
+            this.adm = candidatos.getFirst();
+            this.fimMandato = true;
+            //Comunica aos demais a conclusão do seu mandato;
+            p.setProtocolo(3);
+        }
     }
     
     private void comunicaSala(Protocolo p){

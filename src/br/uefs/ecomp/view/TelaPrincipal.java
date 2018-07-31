@@ -168,7 +168,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         DefaultTableModel tabela  = (DefaultTableModel) tabelaNoticias.getModel();
         
         if (tabelaNoticias.getSelectedRow() == -1) {
-            JOptionPane.showMessageDialog(this, "Porfavor, selecione um produto.", "Atenção!", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Porfavor, selecione uma noticia.", "Atenção!", JOptionPane.WARNING_MESSAGE);
         }else{
             int id = Integer.parseInt((String) tabelaNoticias.getValueAt(tabelaNoticias.getSelectedRow(), 0));
             LerNoticia ln = new LerNoticia(this, true, this.c, id);
@@ -179,7 +179,10 @@ public class TelaPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_lerNoticiaActionPerformed
 
     private void fakesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fakesActionPerformed
-        // TODO add your handling code here:
+        FakeNews fn = new FakeNews(this, true, this.c);
+        fn.setVisible(true);
+        
+        this.listarNoticias();
     }//GEN-LAST:event_fakesActionPerformed
 
     private void refreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshActionPerformed
@@ -209,10 +212,10 @@ public class TelaPrincipal extends javax.swing.JFrame {
                 Noticia n = (Noticia) itr.next();
                 //Verifica se a noticia está na lista de fakenews;
                 if (!c.getFake(n.getId())) {
-                float mediaAvaliacao = (float)n.getNota()/n.getQtdNotas();
-                        
-                String[] s = {""+n.getId(),n.getTitulo(), ""+format(mediaAvaliacao)};
-                tabela.addRow(s);
+                    float mediaAvaliacao = (float)n.getNota()/n.getQtdNotas();
+
+                    String[] s = {""+n.getId(),n.getTitulo(), ""+format(mediaAvaliacao)};
+                    tabela.addRow(s);
                 }
             }
         }
