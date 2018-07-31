@@ -309,7 +309,7 @@ public class Controller {
     
     private void analiseFN() throws InterruptedException{
         //Verifica se o localhost é adm, se for inicia a analise da noticia;
-        Noticia suspeita = this.suspeitas.getFirst();
+        Noticia suspeita = suspeitas.getFirst();
         System.out.println("Iniciando análise de Fake news da Noticia de id: " + suspeita.getId());
 
         Protocolo p = new Protocolo(4, this.nomeLocal);
@@ -323,17 +323,17 @@ public class Controller {
             p.setVeredito(false);
         }else{
             p.setVeredito(true);
-            this.fakeNews.add(suspeita);//Adciona a noticia na lista de fake news;
+            fakeNews.add(suspeita);//Adciona a noticia na lista de fake news;
         }
         p.setProtocolo(6);
         comunicaSala(p); //Envia o veredito para os demais servidores;
         this.suspeitas.removeFirst(); //Remove a noticia da lista de suspeitas;
 
         //Remove-se da lista de candidataos a adm;
-        if (!this.candidatos.isEmpty()) {
-            this.candidatos.removeFirst();
-            this.adm = candidatos.getFirst();
-            this.fimMandato = true;
+        if (candidatos.isEmpty()) {
+            candidatos.removeFirst();
+            adm = candidatos.getFirst();
+            fimMandato = true;
             //Comunica aos demais a conclusão do seu mandato;
             p.setProtocolo(3);
         }
