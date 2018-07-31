@@ -2,20 +2,20 @@ package br.uefs.ecomp.view;
 
 import br.uefs.ecomp.controller.Controller;
 import br.uefs.ecomp.model.Noticia;
-import javax.swing.ImageIcon;
+import java.text.DecimalFormat;
 import javax.swing.JOptionPane;
 
 //@author Eduardo
 public class LerNoticia extends javax.swing.JDialog {
     private Controller c;
-    private Noticia n;
+    private int idNoticia;
             
-    public LerNoticia(java.awt.Frame parent, boolean modal, Controller c, Noticia n) {
+    public LerNoticia(java.awt.Frame parent, boolean modal, Controller c, int idNoticia) {
         super(parent, modal);
         initComponents();
         this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/logonews.png")).getImage());
         this.c = c;
-        this.n = n;
+        this.idNoticia = idNoticia;
         this.exibeNoticia();
     }
     
@@ -42,10 +42,9 @@ public class LerNoticia extends javax.swing.JDialog {
         sliderAvaliacao = new javax.swing.JSlider();
         jLabel3 = new javax.swing.JLabel();
         estrelaAvaliacao = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        avalia = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setResizable(false);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -56,6 +55,7 @@ public class LerNoticia extends javax.swing.JDialog {
 
         texto.setEditable(false);
         texto.setColumns(20);
+        texto.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         texto.setLineWrap(true);
         texto.setRows(5);
         texto.setWrapStyleWord(true);
@@ -82,63 +82,60 @@ public class LerNoticia extends javax.swing.JDialog {
 
         estrelaAvaliacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/e1.png"))); // NOI18N
 
-        jButton1.setBackground(new java.awt.Color(255, 204, 0));
-        jButton1.setForeground(new java.awt.Color(255, 255, 255));
-        jButton1.setText("Enviar");
+        avalia.setBackground(new java.awt.Color(255, 204, 0));
+        avalia.setForeground(new java.awt.Color(255, 255, 255));
+        avalia.setText("Enviar");
+        avalia.setEnabled(false);
+        avalia.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                avaliaActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(102, 102, 102)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(10, 10, 10)
-                                .addComponent(titulo))
-                            .addComponent(jLabel1))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(setAvaliacao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane1))
+                    .addComponent(jScrollPane1)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(sliderAvaliacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(10, 10, 10)
-                                .addComponent(estrelaAvaliacao)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton1)))))
+                        .addComponent(setAvaliacao)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 79, Short.MAX_VALUE)
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(sliderAvaliacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(estrelaAvaliacao)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(avalia))
+                    .addComponent(titulo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(197, 197, 197)
+                .addComponent(jLabel1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(titulo))
-                    .addComponent(setAvaliacao))
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+                .addComponent(titulo)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 310, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 322, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addGap(9, 9, 9)
-                        .addComponent(sliderAvaliacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(estrelaAvaliacao)
-                    .addComponent(jButton1))
-                .addGap(29, 29, 29))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(estrelaAvaliacao)
+                            .addComponent(avalia, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel3)
+                                .addComponent(sliderAvaliacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap())
+                    .addComponent(setAvaliacao, javax.swing.GroupLayout.Alignment.TRAILING)))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -154,8 +151,8 @@ public class LerNoticia extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 524, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -163,18 +160,39 @@ public class LerNoticia extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void setAvaliacaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setAvaliacaoActionPerformed
-        System.out.println(estrelaAvaliacao.getIcon());
-        //JOptionPane.showInputDialog(this, "Defina uma nota de avaliação!", "Avaliação!", WIDTH);
+        int nota = Integer.parseInt((String) JOptionPane.showInputDialog(this, "Defina uma nota de avaliação", "Avaliação", WIDTH, new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/e5.png")), null, null));
+        while (nota < 0) {
+            nota = Integer.parseInt((String) JOptionPane.showInputDialog(this, "Por favor, insira um valor maior que 0", "Avaliação", WIDTH, new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/e5.png")), null, null));
+        }
+        
+        int qtdNota = Integer.parseInt((String) JOptionPane.showInputDialog(this, "Defina uma quantidade de avaliações", "Avaliação", WIDTH, new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/e5.png")), null, null));
+        while (qtdNota < 0) {
+            qtdNota = Integer.parseInt((String) JOptionPane.showInputDialog(this, "Por favor, insira um valor maior que 0", "Avaliação", WIDTH, new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/e5.png")), null, null));
+        }
+        
+        c.setAvaliacao(this.idNoticia, nota, qtdNota);
     }//GEN-LAST:event_setAvaliacaoActionPerformed
 
     //------------------------------------------------------------------------//
     public void exibeNoticia(){
+        Noticia n = c.getNoticia(this.idNoticia);
+        
         titulo.setText(n.getTitulo());
         texto.setText(n.getTexto());
-        setAvaliacao.setText(""+n.getNota());
+        float media = (float)n.getNota()/n.getQtdNotas();
+        setAvaliacao.setText(""+format(media));
+    }
+    
+    //Formata o valor Double para 1 ou 2 casas decimais depois da virgula.
+    private String format(double valor){
+        DecimalFormat df = new DecimalFormat("0.#");
+        String v = df.format(valor);
+        return v;
     }
     //------------------------------------------------------------------------//
     private void sliderAvaliacaoStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sliderAvaliacaoStateChanged
+        avalia.setEnabled(true);
+        
         if(sliderAvaliacao.getValue() == 1){
             estrelaAvaliacao.setText("1");
             estrelaAvaliacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/e1.png")));
@@ -192,6 +210,12 @@ public class LerNoticia extends javax.swing.JDialog {
             estrelaAvaliacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/e5.png")));
         }
     }//GEN-LAST:event_sliderAvaliacaoStateChanged
+
+    private void avaliaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_avaliaActionPerformed
+        int nota = sliderAvaliacao.getValue();
+        c.avaliacao(nota, this.idNoticia);
+        avalia.setEnabled(false);
+    }//GEN-LAST:event_avaliaActionPerformed
 
     /**
      * @param args the command line arguments
@@ -237,8 +261,8 @@ public class LerNoticia extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton avalia;
     private javax.swing.JLabel estrelaAvaliacao;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;

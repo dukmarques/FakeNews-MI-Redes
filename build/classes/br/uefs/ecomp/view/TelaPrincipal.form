@@ -184,6 +184,9 @@
               <Image iconType="3" name="/br/uefs/ecomp/icons/refresh.png"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="refreshActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

@@ -4,10 +4,10 @@ public class Noticia {
     private int id;
     private String titulo;
     private String texto;
-    private float nota;
+    private int nota;
     private int qtdNotas;
 
-    public Noticia(int id, String titulo, String texto, float nota, int qtdNotas) {
+    public Noticia(int id, String titulo, String texto, int nota, int qtdNotas) {
         this.id = id;
         this.titulo = titulo;
         this.texto = texto;
@@ -39,11 +39,11 @@ public class Noticia {
         this.texto = texto;
     }
 
-    public float getNota() {
+    public int getNota() {
         return nota;
     }
 
-    public void setNota(float nota) {
+    public void setNota(int nota) {
         this.nota = nota;
     }
 

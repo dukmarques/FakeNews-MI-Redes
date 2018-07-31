@@ -4,14 +4,15 @@ package br.uefs.ecomp.view;
 
 import br.uefs.ecomp.controller.Controller;
 import br.uefs.ecomp.model.Noticia;
+import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.LinkedList;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class TelaPrincipal extends javax.swing.JFrame {
-    Controller c = new Controller();
-    LinkedList<Noticia> noticias;
+    Controller c = new Controller(); //Controller da aplicação;
+    LinkedList<Noticia> noticias; //Lista de noticias;
     
     public TelaPrincipal() {
         initComponents();
@@ -97,6 +98,11 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
         refresh.setBackground(new java.awt.Color(204, 255, 255));
         refresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/refresh.png"))); // NOI18N
+        refresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                refreshActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -158,13 +164,27 @@ public class TelaPrincipal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void lerNoticiaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lerNoticiaActionPerformed
-        // TODO add your handling code here:
+        DefaultTableModel tabela  = (DefaultTableModel) tabelaNoticias.getModel();
+        
+        if (tabelaNoticias.getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(this, "Porfavor, selecione um produto.", "Atenção!", JOptionPane.WARNING_MESSAGE);
+        }else{
+            int id = Integer.parseInt((String) tabelaNoticias.getValueAt(tabelaNoticias.getSelectedRow(), 0));
+            LerNoticia ln = new LerNoticia(this, true, this.c, id);
+            ln.setVisible(true);
+            
+            this.listarNoticias();
+        }
     }//GEN-LAST:event_lerNoticiaActionPerformed
 
     private void fakesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fakesActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_fakesActionPerformed
 
+    private void refreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshActionPerformed
+        //Atualiza a lista de noticias;
+        this.listarNoticias();
+    }//GEN-LAST:event_refreshActionPerformed
 // -----------------------------------------------------------------------//
     public void inicia(){
         this.listarNoticias();
@@ -184,7 +204,9 @@ public class TelaPrincipal extends javax.swing.JFrame {
             Iterator itr = noticias.iterator();
             while (itr.hasNext()) {
                 Noticia n = (Noticia) itr.next();
-                String[] s = {""+n.getId(),n.getTitulo(), ""+n.getNota()};
+                float mediaAvaliacao = (float)n.getNota()/n.getQtdNotas();
+                        
+                String[] s = {""+n.getId(),n.getTitulo(), ""+format(mediaAvaliacao)};
                 tabela.addRow(s);
             }
         }
@@ -193,6 +215,13 @@ public class TelaPrincipal extends javax.swing.JFrame {
     public void disableButtons(boolean set){
         lerNoticia.setEnabled(set);
         fakes.setEnabled(set);
+    }
+    
+    //Formata o valor Double para 1 ou 2 casas decimais depois da virgula.
+    private String format(double valor){
+        DecimalFormat df = new DecimalFormat("0.#");
+        String v = df.format(valor);
+        return v;
     }
 // -----------------------------------------------------------------------//
 
