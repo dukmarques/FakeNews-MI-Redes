@@ -188,6 +188,8 @@ public class TelaPrincipal extends javax.swing.JFrame {
 // -----------------------------------------------------------------------//
     public void inicia(){
         this.listarNoticias();
+        this.c.startMulticast();
+        this.c.avisaSala();
     }
     
     public void listarNoticias(){
@@ -204,10 +206,13 @@ public class TelaPrincipal extends javax.swing.JFrame {
             Iterator itr = noticias.iterator();
             while (itr.hasNext()) {
                 Noticia n = (Noticia) itr.next();
+                //Verifica se a noticia está na lista de fakenews;
+                if (!c.getFake(n.getId())) {
                 float mediaAvaliacao = (float)n.getNota()/n.getQtdNotas();
                         
                 String[] s = {""+n.getId(),n.getTitulo(), ""+format(mediaAvaliacao)};
                 tabela.addRow(s);
+                }
             }
         }
     }

@@ -2,6 +2,7 @@ package br.uefs.ecomp.view;
 
 import br.uefs.ecomp.controller.Controller;
 import br.uefs.ecomp.model.Noticia;
+import java.awt.Color;
 import java.text.DecimalFormat;
 import javax.swing.JOptionPane;
 
@@ -43,6 +44,7 @@ public class LerNoticia extends javax.swing.JDialog {
         jLabel3 = new javax.swing.JLabel();
         estrelaAvaliacao = new javax.swing.JLabel();
         avalia = new javax.swing.JButton();
+        alert = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -92,28 +94,35 @@ public class LerNoticia extends javax.swing.JDialog {
             }
         });
 
+        alert.setText("Detectamos uma suspeita desta mensagem ser falsa. Estamos analisando nossa base de dados a respeito.");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(setAvaliacao)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 79, Short.MAX_VALUE)
-                        .addComponent(jLabel3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(sliderAvaliacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(estrelaAvaliacao)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(avalia))
-                    .addComponent(titulo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addComponent(setAvaliacao)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 164, Short.MAX_VALUE)
+                                .addComponent(jLabel3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(sliderAvaliacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(estrelaAvaliacao)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(avalia))
+                            .addComponent(titulo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(alert, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(197, 197, 197)
+                .addGap(243, 243, 243)
                 .addComponent(jLabel1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -121,9 +130,11 @@ public class LerNoticia extends javax.swing.JDialog {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(alert)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(titulo)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 310, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -159,6 +170,8 @@ public class LerNoticia extends javax.swing.JDialog {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    //Método utilizado para setar uma avaliação em uma determinada noticia;
+    //Utilizado para testes na apresentação;
     private void setAvaliacaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setAvaliacaoActionPerformed
         int nota = Integer.parseInt((String) JOptionPane.showInputDialog(this, "Defina uma nota de avaliação", "Avaliação", WIDTH, new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/e5.png")), null, null));
         while (nota < 0) {
@@ -174,8 +187,22 @@ public class LerNoticia extends javax.swing.JDialog {
     }//GEN-LAST:event_setAvaliacaoActionPerformed
 
     //------------------------------------------------------------------------//
+    //Lista os dados da noticia na tela;
     public void exibeNoticia(){
+        alert.setVisible(false);
         Noticia n = c.getNoticia(this.idNoticia);
+        
+        if (c.getSuspeita(this.idNoticia)) {
+            alert.setVisible(true);
+            alert.setText("Detectamos uma suspeita desta noticia ser falsa. Estamos analisando nossa base de dados a respeito.");
+            alert.setForeground(Color.yellow);
+            alert.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/atencao.png")));
+        }else if (c.getFake(this.idNoticia)) {
+            alert.setVisible(true);
+            alert.setText("Esta notícia foi listada como Fake News em nossa base de dados!");
+            alert.setForeground(Color.red);
+            alert.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/error.png")));
+        }
         
         titulo.setText(n.getTitulo());
         texto.setText(n.getTexto());
@@ -211,6 +238,7 @@ public class LerNoticia extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_sliderAvaliacaoStateChanged
 
+    //Função para os usuários avaliarem as noticias;
     private void avaliaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_avaliaActionPerformed
         int nota = sliderAvaliacao.getValue();
         c.avaliacao(nota, this.idNoticia);
@@ -261,6 +289,7 @@ public class LerNoticia extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel alert;
     private javax.swing.JButton avalia;
     private javax.swing.JLabel estrelaAvaliacao;
     private javax.swing.JLabel jLabel1;

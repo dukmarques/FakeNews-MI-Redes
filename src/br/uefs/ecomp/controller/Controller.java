@@ -21,10 +21,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Controller {
+    //--------Listas-------------------//
     LinkedList<Noticia> noticias; //lista de noticias;
-    LinkedList<Servidor> servidores = new LinkedList<>();
+    LinkedList<Noticia> fakeNews = new LinkedList<>();        //Lista de noticias atribuidas como fake news;
+    LinkedList<Noticia> suspeitas = new LinkedList<>();      //Lista de noticias suspeitas de fake news;
+    LinkedList<Servidor> candidatos = new LinkedList<>();   //Lista de ordem para servidores se tornarem admins;
+    
+    Servidor adm;
     MulticastSocket socket; //Multicast socket para comunicação em grupo;
-    boolean conectado = false;
+    boolean fimMandato = true;
+    int votoNFN = 0, votoFK = 0; 
+    
     private int id; //Para testes;
     
     public LinkedList<Noticia> getNoticias(){
@@ -54,8 +61,8 @@ public class Controller {
         n.setQtdNotas(n.getQtdNotas()+1); //Incrementa a quantidade de classificações que já foram realizadas;
         
         //Verifica se a noticia atingiu o estado de suspeita de fake news;
-        if(false){
-            
+        if((n.getNota()/n.getQtdNotas()) < 3){
+            this.suspeitas.add(n);
         }
     }
     
@@ -65,8 +72,8 @@ public class Controller {
         n.setQtdNotas(qtdNota); //Atualiza o valor da quantidade de notas recebidas;
         
         //Verifica se a noticia atingiu o estado de suspeita de fake news;
-        if (false) {
-            
+        if((n.getNota()/n.getQtdNotas()) < 3){
+            this.suspeitas.add(n);
         }
     }
     
@@ -92,8 +99,38 @@ public class Controller {
         }
         return false;
     }
+    
+    public boolean getSuspeita(int id){
+        Iterator itr = suspeitas.iterator();
+        while (itr.hasNext()) {
+            Noticia n = (Noticia) itr.next();
+            if (n.getId() == id) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public void removeSuspeita(int id){
+        Iterator itr = this.suspeitas.iterator();
+        while (itr.hasNext()) {
+            Noticia n = (Noticia) itr.next();
+            if (n.getId() == id) {
+                this.suspeitas.remove(n);
+            }
+        }
+    }
+    public boolean getFake(int d){
+        Iterator itr = fakeNews.iterator();
+        while (itr.hasNext()) {
+            Noticia n = (Noticia) itr.next();
+            if (n.getId() == id) {
+                return true;
+            }
+        }
+        return false;
+    }
     // --------------------------Comunicação----------------------------------//
-    private void startMulticast(){
+    public void startMulticast(){
         try {
             socket = new MulticastSocket(1223);
             InetAddress enderecoMulticast = InetAddress.getByName("236.52.65.9");
@@ -121,6 +158,8 @@ public class Controller {
                                         trataProtocolo(p);
                                     } catch (UnknownHostException ex) {
                                         Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+                                    } catch (InterruptedException ex) {
+                                        Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
                                     }
                                 }
                             }.start();
@@ -138,27 +177,116 @@ public class Controller {
         }
     }
     
-    public void trataProtocolo(Protocolo p) throws UnknownHostException{
+    public void trataProtocolo(Protocolo p) throws UnknownHostException, InterruptedException{
         if (!p.getServidor().getIp().equals(InetAddress.getLocalHost().getAddress())
                 || p.getServidor().getId() != this.id) {
             
             //Se o protocolo for 0, significa que um novo servidor entrou no multicast, então todos servidores atualizam
-            //sua lista e respondem o multicast para que o novo servidor possa atualizar sua lista igualmente;
-            if (p.getProtocolo() == 0) {
-                servidores.add(p.getServidor());
+            //sua lista e o adm da rodada responde o multicast para que o novo servidor possa atualizar sua lista igualmente;
+            if (this.adm == null) { //Verifica se o adm é nulo, caso o servidor seja o primeiro a iniciar o multicast;
+                adm = new Servidor();
+            }
+            if (p.getProtocolo() == 0 && this.adm.getIp().equals(InetAddress.getLocalHost().getHostAddress()) ) {
                 Protocolo resposta = new Protocolo(1);
                 resposta.getServidor().setId(id);
                 comunicaSala(resposta);
             }
             
-            //Se o protocolo for 2, é a resposta dos servidores para o servidor que acabou de se conectar;
-            //Verifica se ja está conectado para entrar nessa opção;
-            if (p.getProtocolo() == 1) {
-                servidores.add(p.getServidor());
+            //Se o protocolo for 1, é a resposta do adm da rodada para o servidor que acabou de se conectar;
+            if (p.getProtocolo() == 1 && this.adm == null) {
+                this.adm = p.getAdm();
             }
             
+            //Se o protocolo for 2, algum servidor está solicitando ser adm;
+            if (p.getProtocolo() == 2) {
+                this.candidatos.add(p.getServidor()); //Insere o servidor na lista de candidatos;
+                //Verifica se o servidor local é o ADM e se já concluiu seu mandato;
+                if (this.adm.getIp().equals(InetAddress.getLocalHost().getHostAddress()) && this.fimMandato == true) {
+                    this.candidatos.removeFirst();
+                    Protocolo concluirMandato = new Protocolo(3);
+                    comunicaSala(concluirMandato);
+                }
+            }
             
+            //Se o protocolo for 3, o adm da rodada atual está passando o cargo para o proximo servidor da lista;
+            if (p.getProtocolo() == 3) {
+                if (!this.candidatos.isEmpty()) {
+                    this.candidatos.removeFirst(); //Remove o primeiro da lista que é o Adm;
+                    this.adm = this.candidatos.getFirst(); //Torna o novo primeiro da lista como adm;
+                    
+                    //Verifica se o localhost é o admin atual e se possui alguma suspeita na sua lista;
+                    if (this.adm.getIp().equals(InetAddress.getLocalHost().getHostAddress()) && !this.suspeitas.isEmpty()) {
+                        this.fimMandato = false;
+                        this.analiseFN();
+                    }else{
+                        Protocolo passaMandato = new Protocolo(3);
+                        comunicaSala(passaMandato);
+                    }
+                }
+            }
+            
+            //Se o protocolo for 4, o adm está enviando uma suspeita;
+            if (p.getProtocolo() == 4) {
+                Noticia suspeita = getNoticia(p.getIdNoticia());
+                float media = (float) suspeita.getNota()/suspeita.getQtdNotas();
+                
+                Protocolo respSuspeita = new Protocolo(5);
+                if (media > 3) {
+                    respSuspeita.setFakeNews(false);
+                }else{
+                    respSuspeita.setFakeNews(true);
+                }
+                comunicaSala(respSuspeita);
+            }
+            
+            //Se o protocolo for 5, são as respostas dos servidores sobre o a suspeita;
+            if (p.getProtocolo() == 5 && adm.getIp().equals(InetAddress.getLocalHost().getHostAddress())) {
+                if (p.isFakeNews()) {
+                    this.votoFK++;
+                }
+                if (!p.isFakeNews()) {
+                    this.votoNFN++;
+                }
+            }
+            
+            //Se o protocolo for 6, é o veredito do adm sobre a suspeita analisada;
+            if (p.getProtocolo() == 6) {
+                
+            }
         }
+    }
+    
+    public void avisaSala(){
+        Protocolo p = new Protocolo(0);
+        comunicaSala(p);
+    }
+    
+    private void analiseFN() throws InterruptedException{
+        Noticia suspeita = this.suspeitas.getFirst();
+        
+        Protocolo p = new Protocolo(4);
+        p.setIdNoticia(suspeita.getId());
+        comunicaSala(p); //Envia para o multicast o id da suspeita;
+        
+        Thread.sleep(5000); //tempo de espera das respostas dos demais servidores;
+        
+        boolean veredito;
+        if (votoNFN >= ((67*5)/100) ) {
+            p.setVeredito(false);
+        }else{
+            p.setVeredito(true);
+            this.fakeNews.add(suspeita);//Adciona a noticia na lista de fake news;
+        }
+        p.setProtocolo(6);
+        comunicaSala(p); //Envia o veredito para os demais servidores;
+        this.suspeitas.removeFirst(); //Remove a noticia da lista de suspeitas;
+        
+        //Remove-se da lista de candidataos a adm;
+        this.candidatos.removeFirst();
+        this.adm = candidatos.getFirst();
+        this.fimMandato = true;
+        //Comunica aos demais a conclusão do seu mandato;
+        p.setProtocolo(3);
     }
     
     private void comunicaSala(Protocolo p){
