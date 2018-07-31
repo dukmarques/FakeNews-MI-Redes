@@ -178,8 +178,8 @@ public class Controller {
     }
     
     public void trataProtocolo(Protocolo p) throws UnknownHostException, InterruptedException{
-        if (!p.getServidor().getIp().equals(InetAddress.getLocalHost().getAddress())
-                || p.getServidor().getId() != this.id) {
+        System.out.println("Servidor " + p.getServidor().getIp() + " requisita: " + p.getProtocolo());
+        if (!p.getServidor().getIp().equals(InetAddress.getLocalHost().getAddress())) {
             
             //Se o protocolo for 0, significa que um novo servidor entrou no multicast, então todos servidores atualizam
             //sua lista e o adm da rodada responde o multicast para que o novo servidor possa atualizar sua lista igualmente;
@@ -251,7 +251,15 @@ public class Controller {
             
             //Se o protocolo for 6, é o veredito do adm sobre a suspeita analisada;
             if (p.getProtocolo() == 6) {
-                
+                //Verifica o veredito da noticia passada pelo adm da rodada;
+                if (p.isVeredito()) {
+                    Noticia n = getNoticia(p.getIdNoticia());
+                    this.fakeNews.add(n); //Se for fake news adiciona a noticia a lista de fakenews;
+                }
+                //Verifica se a noticia está na lista de suspeitas, caso esteja é removida;
+                if (getSuspeita(p.getIdNoticia())) {
+                    this.removeSuspeita(p.getIdNoticia());
+                }
             }
         }
     }
