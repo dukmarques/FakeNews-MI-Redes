@@ -81,6 +81,7 @@ public class Controller {
                 this.analiseFN();
             }else{
                 Protocolo p = new Protocolo(2, nomeLocal);
+                comunicaSala(p);
             }
         }
     }
@@ -98,6 +99,7 @@ public class Controller {
                 this.analiseFN();
             }else{
                 Protocolo p = new Protocolo(2, nomeLocal);
+                comunicaSala(p);
             }
         }
     }
