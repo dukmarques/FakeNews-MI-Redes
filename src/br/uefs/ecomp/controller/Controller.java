@@ -42,7 +42,7 @@ public class Controller {
         }
     }
     
-    
+// ----------------------- NOTICIAs -------------------------------------------//
     public LinkedList<Noticia> getNoticias(){
         try {
             if (noticias == null) {
@@ -64,25 +64,33 @@ public class Controller {
         return noticias;
     }
     
-    public void avaliacao(int nota, int idNoticia){
+    public void avaliacao(int nota, int idNoticia) throws InterruptedException{
         Noticia n = getNoticia(idNoticia); //Pega a instancia da noticia na lista;
         n.setNota(n.getNota()+ nota); //Soma a nota dada com as notas já recebidas pela noticia;
         n.setQtdNotas(n.getQtdNotas()+1); //Incrementa a quantidade de classificações que já foram realizadas;
         
         //Verifica se a noticia atingiu o estado de suspeita de fake news;
-        if((n.getNota()/n.getQtdNotas()) < 3){
+        if(n.getQtdNotas() >= 10 && (n.getNota()/n.getQtdNotas()) < 3){
             this.suspeitas.add(n);
+            
+            if (this.adm.equals(this.nomeLocal)) {
+                this.analiseFN();
+            }
         }
     }
     
-    public void setAvaliacao(int idNoticia, int nota, int qtdNota){
+    public void setAvaliacao(int idNoticia, int nota, int qtdNota) throws InterruptedException{
         Noticia n = getNoticia(idNoticia); //Recupera a noticia da lista;
         n.setNota(nota); //Atualiza o valor da nota recebida;
         n.setQtdNotas(qtdNota); //Atualiza o valor da quantidade de notas recebidas;
         
         //Verifica se a noticia atingiu o estado de suspeita de fake news;
-        if((n.getNota()/n.getQtdNotas()) < 3){
+        if(n.getQtdNotas() >= 10 && (n.getNota()/n.getQtdNotas()) < 3){
             this.suspeitas.add(n);
+            
+            if (this.adm.equals(this.nomeLocal)) {
+                this.analiseFN();
+            }
         }
     }
     
@@ -138,7 +146,7 @@ public class Controller {
         }
         return false;
     }
-    // --------------------------Comunicação----------------------------------//
+// ------------------------------Comunicação----------------------------------//
     public void startMulticast(){
         try {
             socket = new MulticastSocket(1223);
@@ -194,6 +202,7 @@ public class Controller {
             //sua lista e o adm da rodada responde o multicast para que o novo servidor possa atualizar sua lista igualmente;
             if (this.adm == null) { //Verifica se o adm é nulo, caso o servidor seja o primeiro a iniciar o multicast;
                 adm = this.nomeLocal;
+                System.out.println("Adm: " + this.adm);
             }
             if (p.getProtocolo() == 0 && this.adm.equals(this.nomeLocal) ) {
                 Protocolo resposta = new Protocolo(1, this.nomeLocal);
@@ -204,6 +213,7 @@ public class Controller {
             //Se o protocolo for 1, é a resposta do adm da rodada para o servidor que acabou de se conectar;
             if (p.getProtocolo() == 1 && this.adm == null) {
                 this.adm = p.getAdm();
+                System.out.println("Adm da sala: " + this.adm);
             }
             
             //Se o protocolo for 2, algum servidor está solicitando ser adm;
@@ -247,6 +257,7 @@ public class Controller {
                     respSuspeita.setFakeNews(true);
                 }
                 comunicaSala(respSuspeita);
+                System.out.println("Id Noticia suspeita: " + suspeita.getId() + "Analise: " + respSuspeita.isFakeNews());
             }
             
             //Se o protocolo for 5, são as respostas dos servidores sobre o a suspeita;
@@ -257,11 +268,13 @@ public class Controller {
                 if (!p.isFakeNews()) {
                     this.votoNFN++;
                 }
+                System.out.println("Resposta do Servidor " + p.getNomeServidor() + " sobre a notica: " + p.isFakeNews());
             }
             
             //Se o protocolo for 6, é o veredito do adm sobre a suspeita analisada;
             if (p.getProtocolo() == 6) {
                 //Verifica o veredito da noticia passada pelo adm da rodada;
+                System.out.println("Veredito da notica de id "+p.getIdNoticia()+": "+p.isVeredito());
                 if (p.isVeredito()) {
                     Noticia n = getNoticia(p.getIdNoticia());
                     this.fakeNews.add(n); //Se for fake news adiciona a noticia a lista de fakenews;
@@ -281,6 +294,7 @@ public class Controller {
     
     private void analiseFN() throws InterruptedException{
         Noticia suspeita = this.suspeitas.getFirst();
+        System.out.println("Iniciando análise de Fake news da Noticia de id: " + suspeita.getId());
         
         Protocolo p = new Protocolo(4, this.nomeLocal);
         p.setIdNoticia(suspeita.getId());
