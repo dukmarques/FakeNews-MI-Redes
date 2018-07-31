@@ -190,6 +190,7 @@ public class LerNoticia extends javax.swing.JDialog {
         } catch (InterruptedException ex) {
             Logger.getLogger(LerNoticia.class.getName()).log(Level.SEVERE, null, ex);
         }
+        this.exibeNoticia();
     }//GEN-LAST:event_setAvaliacaoActionPerformed
 
     //------------------------------------------------------------------------//
@@ -255,6 +256,7 @@ public class LerNoticia extends javax.swing.JDialog {
             Logger.getLogger(LerNoticia.class.getName()).log(Level.SEVERE, null, ex);
         }
         avalia.setEnabled(false);
+        this.exibeNoticia();
     }//GEN-LAST:event_avaliaActionPerformed
 
     /**

@@ -212,6 +212,7 @@ public class Controller {
                 if (this.adm.equals(this.nomeLocal)) {
                     Protocolo resposta = new Protocolo(1, this.nomeLocal);
                     resposta.setAdm(adm);
+                    resposta.setFilaAdm(candidatos);
                     comunicaSala(resposta);
                 }
             }
@@ -219,6 +220,7 @@ public class Controller {
             //Se o protocolo for 1, é a resposta do adm da rodada para o servidor que acabou de se conectar;
             if (p.getProtocolo() == 1 && this.adm == null) {
                 this.adm = p.getAdm();
+                this.candidatos = p.getFilaAdm();
                 System.out.println("Adm da sala: " + this.adm);
             }
             
@@ -299,33 +301,39 @@ public class Controller {
     }
     
     private void analiseFN() throws InterruptedException{
-        Noticia suspeita = this.suspeitas.getFirst();
-        System.out.println("Iniciando análise de Fake news da Noticia de id: " + suspeita.getId());
-        
-        Protocolo p = new Protocolo(4, this.nomeLocal);
-        p.setIdNoticia(suspeita.getId());
-        comunicaSala(p); //Envia para o multicast o id da suspeita;
-        
-        Thread.sleep(5000); //tempo de espera das respostas dos demais servidores;
-        
-        boolean veredito;
-        if (votoNFN >= ((67*5)/100) ) {
-            p.setVeredito(false);
+        //Verifica se o localhost é adm, se for inicia a analise da noticia;
+        if (this.adm.equals(this.nomeLocal)) {
+            Noticia suspeita = this.suspeitas.getFirst();
+            System.out.println("Iniciando análise de Fake news da Noticia de id: " + suspeita.getId());
+
+            Protocolo p = new Protocolo(4, this.nomeLocal);
+            p.setIdNoticia(suspeita.getId());
+            comunicaSala(p); //Envia para o multicast o id da suspeita;
+
+            Thread.sleep(5000); //tempo de espera das respostas dos demais servidores;
+
+            boolean veredito;
+            if (votoNFN >= ((67*5)/100) ) {
+                p.setVeredito(false);
+            }else{
+                p.setVeredito(true);
+                this.fakeNews.add(suspeita);//Adciona a noticia na lista de fake news;
+            }
+            p.setProtocolo(6);
+            comunicaSala(p); //Envia o veredito para os demais servidores;
+            this.suspeitas.removeFirst(); //Remove a noticia da lista de suspeitas;
+
+            //Remove-se da lista de candidataos a adm;
+            if (!this.candidatos.isEmpty()) {
+                this.candidatos.removeFirst();
+                this.adm = candidatos.getFirst();
+                this.fimMandato = true;
+                //Comunica aos demais a conclusão do seu mandato;
+                p.setProtocolo(3);
+            }
         }else{
-            p.setVeredito(true);
-            this.fakeNews.add(suspeita);//Adciona a noticia na lista de fake news;
-        }
-        p.setProtocolo(6);
-        comunicaSala(p); //Envia o veredito para os demais servidores;
-        this.suspeitas.removeFirst(); //Remove a noticia da lista de suspeitas;
-        
-        //Remove-se da lista de candidataos a adm;
-        if (!this.candidatos.isEmpty()) {
-            this.candidatos.removeFirst();
-            this.adm = candidatos.getFirst();
-            this.fimMandato = true;
-            //Comunica aos demais a conclusão do seu mandato;
-            p.setProtocolo(3);
+            Protocolo p = new Protocolo(2, nomeLocal);
+            comunicaSala(p);
         }
     }
     

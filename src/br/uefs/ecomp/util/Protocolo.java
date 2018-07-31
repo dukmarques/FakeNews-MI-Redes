@@ -4,6 +4,7 @@ package br.uefs.ecomp.util;
 import br.uefs.ecomp.model.Servidor;
 import java.io.Serializable;
 import java.net.InetAddress;
+import java.util.LinkedList;
 
 public class Protocolo implements Serializable{
     private int protocolo;
@@ -12,6 +13,7 @@ public class Protocolo implements Serializable{
     private boolean fakeNews;
     private boolean veredito;
     private String adm;
+    private LinkedList<String> filaAdm;
 
     public Protocolo(int protocolo, String nomeServidor) {
         this.protocolo = protocolo;
@@ -64,5 +66,13 @@ public class Protocolo implements Serializable{
 
     public void setFakeNews(boolean fakeNews) {
         this.fakeNews = fakeNews;
+    }
+
+    public LinkedList<String> getFilaAdm() {
+        return filaAdm;
+    }
+
+    public void setFilaAdm(LinkedList<String> filaAdm) {
+        this.filaAdm = filaAdm;
     }
 }
