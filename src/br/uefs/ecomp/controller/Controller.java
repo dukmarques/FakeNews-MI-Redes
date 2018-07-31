@@ -2,7 +2,6 @@ package br.uefs.ecomp.controller;
 
  //@author Eduardo
 import br.uefs.ecomp.model.Noticia;
-import br.uefs.ecomp.model.Servidor;
 import br.uefs.ecomp.util.ManipularArquivo;
 import br.uefs.ecomp.util.Protocolo;
 import br.uefs.ecomp.view.TelaPrincipal;
@@ -25,14 +24,24 @@ public class Controller {
     LinkedList<Noticia> noticias; //lista de noticias;
     LinkedList<Noticia> fakeNews = new LinkedList<>();        //Lista de noticias atribuidas como fake news;
     LinkedList<Noticia> suspeitas = new LinkedList<>();      //Lista de noticias suspeitas de fake news;
-    LinkedList<Servidor> candidatos = new LinkedList<>();   //Lista de ordem para servidores se tornarem admins;
-    
-    Servidor adm;
+    LinkedList<String> candidatos = new LinkedList<>();   //Lista de ordem para servidores se tornarem admins;
     MulticastSocket socket; //Multicast socket para comunicação em grupo;
+    
+    String nomeLocal;
+    String adm;
+    
     boolean fimMandato = true;
     int votoNFN = 0, votoFK = 0; 
+
+    public Controller() {
+        try {
+            this.nomeLocal = InetAddress.getLocalHost().getHostName();
+            System.out.println("Nome Servidor: " + nomeLocal);
+        } catch (UnknownHostException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
     
-    private int id; //Para testes;
     
     public LinkedList<Noticia> getNoticias(){
         try {
@@ -110,20 +119,20 @@ public class Controller {
         }
         return false;
     }
-    public void removeSuspeita(int id){
+    public void removeSuspeita(int idNoticia){
         Iterator itr = this.suspeitas.iterator();
         while (itr.hasNext()) {
             Noticia n = (Noticia) itr.next();
-            if (n.getId() == id) {
+            if (n.getId() == idNoticia) {
                 this.suspeitas.remove(n);
             }
         }
     }
-    public boolean getFake(int d){
+    public boolean getFake(int idNoticia){
         Iterator itr = fakeNews.iterator();
         while (itr.hasNext()) {
             Noticia n = (Noticia) itr.next();
-            if (n.getId() == id) {
+            if (n.getId() == idNoticia) {
                 return true;
             }
         }
@@ -178,17 +187,17 @@ public class Controller {
     }
     
     public void trataProtocolo(Protocolo p) throws UnknownHostException, InterruptedException{
-        System.out.println("Servidor " + p.getServidor().getIp() + " requisita: " + p.getProtocolo());
-        if (!p.getServidor().getIp().equals(InetAddress.getLocalHost().getAddress())) {
+        if (!p.getNomeServidor().equals(this.nomeLocal)) {
+            System.out.println("Servidor " + p.getNomeServidor() + " requisita: " + p.getProtocolo());
             
             //Se o protocolo for 0, significa que um novo servidor entrou no multicast, então todos servidores atualizam
             //sua lista e o adm da rodada responde o multicast para que o novo servidor possa atualizar sua lista igualmente;
             if (this.adm == null) { //Verifica se o adm é nulo, caso o servidor seja o primeiro a iniciar o multicast;
-                adm = new Servidor();
+                adm = this.nomeLocal;
             }
-            if (p.getProtocolo() == 0 && this.adm.getIp().equals(InetAddress.getLocalHost().getHostAddress()) ) {
-                Protocolo resposta = new Protocolo(1);
-                resposta.getServidor().setId(id);
+            if (p.getProtocolo() == 0 && this.adm.equals(this.nomeLocal) ) {
+                Protocolo resposta = new Protocolo(1, this.nomeLocal);
+                resposta.setAdm(adm);
                 comunicaSala(resposta);
             }
             
@@ -199,11 +208,12 @@ public class Controller {
             
             //Se o protocolo for 2, algum servidor está solicitando ser adm;
             if (p.getProtocolo() == 2) {
-                this.candidatos.add(p.getServidor()); //Insere o servidor na lista de candidatos;
+                this.candidatos.add(p.getNomeServidor()); //Insere o servidor na lista de candidatos;
+                
                 //Verifica se o servidor local é o ADM e se já concluiu seu mandato;
-                if (this.adm.getIp().equals(InetAddress.getLocalHost().getHostAddress()) && this.fimMandato == true) {
+                if (this.adm.equals(this.nomeLocal) && this.fimMandato == true) {
                     this.candidatos.removeFirst();
-                    Protocolo concluirMandato = new Protocolo(3);
+                    Protocolo concluirMandato = new Protocolo(3, this.nomeLocal);
                     comunicaSala(concluirMandato);
                 }
             }
@@ -215,11 +225,11 @@ public class Controller {
                     this.adm = this.candidatos.getFirst(); //Torna o novo primeiro da lista como adm;
                     
                     //Verifica se o localhost é o admin atual e se possui alguma suspeita na sua lista;
-                    if (this.adm.getIp().equals(InetAddress.getLocalHost().getHostAddress()) && !this.suspeitas.isEmpty()) {
+                    if (this.adm.equals(this.nomeLocal) && !this.suspeitas.isEmpty()) {
                         this.fimMandato = false;
                         this.analiseFN();
                     }else{
-                        Protocolo passaMandato = new Protocolo(3);
+                        Protocolo passaMandato = new Protocolo(3, this.nomeLocal);
                         comunicaSala(passaMandato);
                     }
                 }
@@ -230,7 +240,7 @@ public class Controller {
                 Noticia suspeita = getNoticia(p.getIdNoticia());
                 float media = (float) suspeita.getNota()/suspeita.getQtdNotas();
                 
-                Protocolo respSuspeita = new Protocolo(5);
+                Protocolo respSuspeita = new Protocolo(5, this.nomeLocal);
                 if (media > 3) {
                     respSuspeita.setFakeNews(false);
                 }else{
@@ -240,7 +250,7 @@ public class Controller {
             }
             
             //Se o protocolo for 5, são as respostas dos servidores sobre o a suspeita;
-            if (p.getProtocolo() == 5 && adm.getIp().equals(InetAddress.getLocalHost().getHostAddress())) {
+            if (p.getProtocolo() == 5 && adm.equals(this.nomeLocal)) {
                 if (p.isFakeNews()) {
                     this.votoFK++;
                 }
@@ -265,14 +275,14 @@ public class Controller {
     }
     
     public void avisaSala(){
-        Protocolo p = new Protocolo(0);
+        Protocolo p = new Protocolo(0, this.nomeLocal);
         comunicaSala(p);
     }
     
     private void analiseFN() throws InterruptedException{
         Noticia suspeita = this.suspeitas.getFirst();
         
-        Protocolo p = new Protocolo(4);
+        Protocolo p = new Protocolo(4, this.nomeLocal);
         p.setIdNoticia(suspeita.getId());
         comunicaSala(p); //Envia para o multicast o id da suspeita;
         

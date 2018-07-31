@@ -4,6 +4,7 @@ package br.uefs.ecomp.view;
 
 import br.uefs.ecomp.controller.Controller;
 import br.uefs.ecomp.model.Noticia;
+import java.net.InetAddress;
 import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.LinkedList;

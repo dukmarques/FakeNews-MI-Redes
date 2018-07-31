@@ -3,41 +3,42 @@ package br.uefs.ecomp.util;
 
 import br.uefs.ecomp.model.Servidor;
 import java.io.Serializable;
+import java.net.InetAddress;
 
 public class Protocolo implements Serializable{
     private int protocolo;
-    private Servidor servidor;
+    private String nomeServidor;
     private int idNoticia;
     private boolean fakeNews;
     private boolean veredito;
-    private Servidor adm;
+    private String adm;
 
-    public Protocolo(int protocolo) {
+    public Protocolo(int protocolo, String nomeServidor) {
         this.protocolo = protocolo;
-        this.servidor = new Servidor();
+        this.nomeServidor = nomeServidor;
     }
 
     public int getProtocolo() {
         return protocolo;
     }
 
-    public Servidor getServidor() {
-        return servidor;
+    public String getNomeServidor() {
+        return nomeServidor;
     }
 
-    public void setServidor(Servidor servidor) {
-        this.servidor = servidor;
+    public void setNomeServidor(String nomeServidor) {
+        this.nomeServidor = nomeServidor;
     }
 
     public void setProtocolo(int protocolo) {
         this.protocolo = protocolo;
     }
 
-    public Servidor getAdm() {
+    public String getAdm() {
         return adm;
     }
 
-    public void setAdm(Servidor adm) {
+    public void setAdm(String adm) {
         this.adm = adm;
     }
 
