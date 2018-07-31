@@ -166,17 +166,15 @@ public class FakeNews extends javax.swing.JDialog {
         LinkedList<Noticia> fakes = c.getFakeNews();
         DefaultTableModel tabela  = (DefaultTableModel) tabelaFake.getModel();
         
-        if (fakes != null) {
-            tabela.setRowCount(0);
+        tabela.setRowCount(0);
             
-            Iterator itr = fakes.iterator();
-            while (itr.hasNext()) {
-                Noticia n = (Noticia) itr.next();
-                float mediaAvaliacao = (float)n.getNota()/n.getQtdNotas();
+        Iterator itr = fakes.iterator();
+        while (itr.hasNext()) {
+            Noticia n = (Noticia) itr.next();
+            float mediaAvaliacao = (float)n.getNota()/n.getQtdNotas();
 
-                String[] s = {""+n.getId(),n.getTitulo(), ""+format(mediaAvaliacao)};
-                tabela.addRow(s);
-            }
+            String[] s = {""+n.getId(),n.getTitulo(), ""+format(mediaAvaliacao)};
+            tabela.addRow(s);
         }
     }
     
