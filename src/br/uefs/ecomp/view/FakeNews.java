@@ -17,6 +17,7 @@ public class FakeNews extends javax.swing.JDialog {
         initComponents();
         this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/logonews.png")).getImage());
         this.c = c;
+        this.listarNoticias();
     }
     
     public FakeNews(java.awt.Frame parent, boolean modal) {
