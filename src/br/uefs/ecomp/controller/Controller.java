@@ -200,14 +200,16 @@ public class Controller {
             
             //Se o protocolo for 0, significa que um novo servidor entrou no multicast, então todos servidores atualizam
             //sua lista e o adm da rodada responde o multicast para que o novo servidor possa atualizar sua lista igualmente;
-            if (this.adm == null) { //Verifica se o adm é nulo, caso o servidor seja o primeiro a iniciar o multicast;
-                adm = this.nomeLocal;
-                System.out.println("Adm: " + this.adm);
-            }
             if (p.getProtocolo() == 0 && this.adm.equals(this.nomeLocal) ) {
-                Protocolo resposta = new Protocolo(1, this.nomeLocal);
-                resposta.setAdm(adm);
-                comunicaSala(resposta);
+                if (this.adm == null) { //Verifica se o adm é nulo, caso o servidor seja o primeiro a iniciar o multicast;
+                    adm = this.nomeLocal;
+                    System.out.println("Adm: " + this.adm);
+                }
+                if (this.adm.equals(this.nomeLocal)) {
+                    Protocolo resposta = new Protocolo(1, this.nomeLocal);
+                    resposta.setAdm(adm);
+                    comunicaSala(resposta);
+                }
             }
             
             //Se o protocolo for 1, é a resposta do adm da rodada para o servidor que acabou de se conectar;
