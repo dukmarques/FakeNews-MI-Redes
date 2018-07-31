@@ -184,7 +184,7 @@ public class Controller {
                                 @Override
                                 public void run(){
                                     try {
-                                        trataProtocolo(p);
+                                        trataProtocolo(p, suspeitas);
                                     } catch (UnknownHostException ex) {
                                         Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
                                     } catch (InterruptedException ex) {
@@ -206,7 +206,7 @@ public class Controller {
         }
     }
     
-    public void trataProtocolo(Protocolo p) throws UnknownHostException, InterruptedException{
+    public void trataProtocolo(Protocolo p, LinkedList<Noticia> suspeitas) throws UnknownHostException, InterruptedException{
         if (!p.getNomeServidor().equals(this.nomeLocal)) {
             System.out.println("Servidor " + p.getNomeServidor() + " requisita: " + p.getProtocolo());
             
@@ -238,8 +238,8 @@ public class Controller {
                 
                 //Verifica se o servidor local é o ADM e se já concluiu seu mandato;
                 if (this.adm.equals(this.nomeLocal) && this.fimMandato == true) {
-                    this.candidatos.removeFirst();
                     Protocolo concluirMandato = new Protocolo(3, this.nomeLocal);
+                    concluirMandato.setAdm(this.candidatos.getFirst());
                     comunicaSala(concluirMandato);
                 }
             }
@@ -247,11 +247,10 @@ public class Controller {
             //Se o protocolo for 3, o adm da rodada atual está passando o cargo para o proximo servidor da lista;
             if (p.getProtocolo() == 3) {
                 if (!this.candidatos.isEmpty()) {
-                    this.candidatos.removeFirst(); //Remove o primeiro da lista que é o Adm;
-                    this.adm = this.candidatos.getFirst(); //Torna o novo primeiro da lista como adm;
+                    this.adm = p.getAdm(); //Torna o novo primeiro da lista como adm;
                     
                     //Verifica se o localhost é o admin atual e se possui alguma suspeita na sua lista;
-                    if (this.adm.equals(this.nomeLocal) && !this.suspeitas.isEmpty()) {
+                    if (this.adm.equals(nomeLocal) && !suspeitas.isEmpty()) {
                         this.fimMandato = false;
                         this.analiseFN();
                     }else{
