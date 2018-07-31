@@ -82,6 +82,7 @@ public class Controller {
             }else{
                 Protocolo p = new Protocolo(2, nomeLocal);
                 comunicaSala(p);
+                this.candidatos.add(this.adm);
             }
         }
     }
@@ -100,6 +101,7 @@ public class Controller {
             }else{
                 Protocolo p = new Protocolo(2, nomeLocal);
                 comunicaSala(p);
+                this.candidatos.add(this.adm);
             }
         }
     }
