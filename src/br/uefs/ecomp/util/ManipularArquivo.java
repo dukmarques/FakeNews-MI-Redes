@@ -10,7 +10,7 @@ import java.util.LinkedList;
 
 public class ManipularArquivo {
     
-    //Classe utilizada para ler o arquivo de texto contendo os produtos a venda.
+    //Classe utilizada para ler o arquivo de texto contendo as noticias.
     public static LinkedList<Noticia> getNoticias() throws IOException{
         BufferedReader read; 
         
@@ -32,6 +32,7 @@ public class ManipularArquivo {
         }
     }
     
+    //Método que trata cada linha lida no arquivo e instancia uma noticia com os dados lidos;
     private static Noticia trataString(String linha){
         String[] texto = linha.split(";");
         Noticia n = new Noticia(Integer.parseInt(texto[0]), texto[1], texto[2],0, 0);

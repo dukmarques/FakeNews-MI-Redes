@@ -164,6 +164,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    //Método utilizado para ler uma noticia que está listada na tabela;
     private void lerNoticiaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lerNoticiaActionPerformed
         DefaultTableModel tabela  = (DefaultTableModel) tabelaNoticias.getModel();
         
@@ -178,6 +179,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_lerNoticiaActionPerformed
 
+    //Método que abre a janela de listagem de mensagens que foram listadas como fake news;
     private void fakesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fakesActionPerformed
         FakeNews fn = new FakeNews(this, true, this.c);
         fn.setVisible(true);
@@ -185,17 +187,20 @@ public class TelaPrincipal extends javax.swing.JFrame {
         this.listarNoticias();
     }//GEN-LAST:event_fakesActionPerformed
 
+    //Método que atualiza as noticias;
     private void refreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshActionPerformed
         //Atualiza a lista de noticias;
         this.listarNoticias();
     }//GEN-LAST:event_refreshActionPerformed
 // -----------------------------------------------------------------------//
+    //Método responsável por iniciar as configurações quando o servidor é iniciado;
     public void inicia(){
-        this.listarNoticias();
-        this.c.startMulticast();
-        this.c.avisaSala();
+        this.listarNoticias(); //lista as noticias;
+        this.c.startMulticast(); //Inicia o multicast;
+        this.c.avisaSala(); //Avisa aos demais servidores de sua entrada via multicast;
     }
     
+    //Método que lista as noticias na tabela;
     public void listarNoticias(){
         this.noticias = c.getNoticias();
         DefaultTableModel tabela  = (DefaultTableModel) tabelaNoticias.getModel();
@@ -210,7 +215,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
             Iterator itr = noticias.iterator();
             while (itr.hasNext()) {
                 Noticia n = (Noticia) itr.next();
-                //Verifica se a noticia está na lista de fakenews;
+                //Verifica se a noticia está presente na lista de fake news, caso esteja ela não é apresentada;
                 if (!c.getFake(n.getId())) {
                     float mediaAvaliacao = (float)n.getNota()/n.getQtdNotas();
 
@@ -221,6 +226,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         }
     }
     
+    //Método responsável por desabilitar/habilitar os botões;
     public void disableButtons(boolean set){
         lerNoticia.setEnabled(set);
         fakes.setEnabled(set);

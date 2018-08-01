@@ -150,6 +150,7 @@ public class FakeNews extends javax.swing.JDialog {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    //Método responsável por abrir tela para ler a noticia;
     private void visualizarNoticiaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_visualizarNoticiaActionPerformed
         DefaultTableModel tabela = (DefaultTableModel) tabelaFake.getModel();
         
@@ -163,6 +164,7 @@ public class FakeNews extends javax.swing.JDialog {
         this.listarNoticias();
     }//GEN-LAST:event_visualizarNoticiaActionPerformed
 
+    //Método responsável por listar as noticias que foram listadas como fake news;
     public void listarNoticias(){
         LinkedList<Noticia> fakes = c.getFakeNews();
         DefaultTableModel tabela  = (DefaultTableModel) tabelaFake.getModel();

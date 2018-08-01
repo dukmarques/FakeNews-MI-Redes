@@ -1,9 +1,7 @@
 package br.uefs.ecomp.util;
 // @author Eduardo
 
-import br.uefs.ecomp.model.Servidor;
 import java.io.Serializable;
-import java.net.InetAddress;
 import java.util.LinkedList;
 
 public class Protocolo implements Serializable{

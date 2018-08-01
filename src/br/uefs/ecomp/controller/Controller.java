@@ -27,15 +27,15 @@ public class Controller {
     LinkedList<String> candidatos = new LinkedList<>();   //Lista de ordem para servidores se tornarem admins;
     MulticastSocket socket; //Multicast socket para comunicação em grupo;
     
-    String nomeLocal;
-    String adm;
+    String nomeLocal; //Nome do servidor local;
+    String adm; //Guarda o admin da rodada;
     
-    boolean fimMandato = true;
-    int votoNFN = 0, votoFK = 0; 
+    boolean fimMandato = true; //Verifica se o mandato do adm já foi concluido;
+    int votoNFN = 0, votoFK = 0; //Variáveis que armazenam o voto dos servidores sobre noticia suspeita;
 
     public Controller() {
         try {
-            this.nomeLocal = InetAddress.getLocalHost().getHostName();
+            this.nomeLocal = InetAddress.getLocalHost().getHostName(); //Atribui o nome da máquina ao nome do servidor;
             System.out.println("Nome Servidor: " + nomeLocal);
         } catch (UnknownHostException ex) {
             System.out.println(ex.getMessage());
@@ -43,6 +43,7 @@ public class Controller {
     }
     
 // ----------------------- NOTICIAs -------------------------------------------//
+    //Pega todas as noticias no arquivo txt;
     public LinkedList<Noticia> getNoticias(){
         try {
             if (noticias == null) {
@@ -64,10 +65,12 @@ public class Controller {
         return noticias;
     }
     
+    //Retorna a lista de noticias listadas como fake news;
     public LinkedList<Noticia> getFakeNews(){
         return this.fakeNews;
     }
     
+    //Método utilizado para avaliação de alguma noticia;
     public void avaliacao(int nota, int idNoticia) throws InterruptedException{
         Noticia n = getNoticia(idNoticia); //Pega a instancia da noticia na lista;
         n.setNota(n.getNota()+ nota); //Soma a nota dada com as notas já recebidas pela noticia;
@@ -75,18 +78,22 @@ public class Controller {
         
         //Verifica se a noticia atingiu o estado de suspeita de fake news;
         if(n.getQtdNotas() >= 10 && (n.getNota()/n.getQtdNotas()) < 3){
-            suspeitas.add(n);
+            suspeitas.add(n); //Add a noticia na lista de suspeitaas para análise;
             
+            //Verifica se a máquina local é o adm, se for, inicia a análise da noticia;
             if (adm.equals(this.nomeLocal)) {
                 analiseFN();
             }else{
+                //Caso não seja o adm da rodada, ele envia uma mensagem para ser inserido na lista de candidatos;
                 Protocolo p = new Protocolo(2, nomeLocal);
                 comunicaSala(p);
-                candidatos.add(adm);
+                candidatos.add(adm); //Se adiciona na lista de candidatos;
             }
         }
     }
     
+    //Método de teste para avaliação do sistema no laboratório;
+    //Utilizado para setar um valor de avaliação de uma determinada noticia;
     public void setAvaliacao(int idNoticia, int nota, int qtdNota) throws InterruptedException{
         Noticia n = getNoticia(idNoticia); //Recupera a noticia da lista;
         n.setNota(nota); //Atualiza o valor da nota recebida;
@@ -106,6 +113,7 @@ public class Controller {
         }
     }
     
+    //Retorna uma determinada noticia de acordo com seu id;
     public Noticia getNoticia(int id){
         Iterator itr = noticias.iterator();
         while (itr.hasNext()) {
@@ -129,6 +137,7 @@ public class Controller {
         return false;
     }
     
+    //Retorna a noticia referente ao id informado que está na lista de suspeitas;
     public boolean getSuspeita(int id){
         Iterator itr = suspeitas.iterator();
         while (itr.hasNext()) {
@@ -139,6 +148,7 @@ public class Controller {
         }
         return false;
     }
+    //Remove uma determinada noticia da lista de suspeitas;
     public void removeSuspeita(int idNoticia){
         Iterator itr = this.suspeitas.iterator();
         while (itr.hasNext()) {
@@ -148,6 +158,7 @@ public class Controller {
             }
         }
     }
+    //Método utilizado para verificar se uma determinada noticia está listada como fake news;
     public boolean getFake(int idNoticia){
         Iterator itr = fakeNews.iterator();
         while (itr.hasNext()) {
@@ -159,6 +170,7 @@ public class Controller {
         return false;
     }
 // ------------------------------Comunicação----------------------------------//
+    //Método que inicia a thread de multicast;
     public void startMulticast(){
         try {
             socket = new MulticastSocket(1223);
@@ -206,6 +218,7 @@ public class Controller {
         }
     }
     
+    //Método que trata as requisições recebidas pelo multicast;
     public void trataProtocolo(Protocolo p, LinkedList<Noticia> suspeitas) throws UnknownHostException, InterruptedException{
         if (!p.getNomeServidor().equals(nomeLocal)) {
             System.out.println("Servidor " + p.getNomeServidor() + " requisita: " + p.getProtocolo());
@@ -302,11 +315,13 @@ public class Controller {
         }
     }
     
+    //Método utilizado quando um servidor entra no multicast;
     public void avisaSala(){
         Protocolo p = new Protocolo(0, this.nomeLocal);
         comunicaSala(p);
     }
     
+    //Método utilizado para verificar se uma noticia é fake news;
     private void analiseFN() throws InterruptedException{
         //Verifica se o localhost é adm, se for inicia a analise da noticia;
         Noticia suspeita = suspeitas.getFirst();
@@ -319,12 +334,13 @@ public class Controller {
         Thread.sleep(5000); //tempo de espera das respostas dos demais servidores;
 
         boolean veredito;
+        //Analisa pelos votos dos demais servidores em multicast se a noticia é fake news ou não;
         if (votoNFN >= ((67*5)/100) ) {
-            p.setVeredito(false);
+            p.setVeredito(false); //Decide que a noticia não é fake news;
             votoNFN = 0;
             votoFK = 0;
         }else{
-            p.setVeredito(true);
+            p.setVeredito(true); //Decide que a noticia é fake news;
             fakeNews.add(suspeita);//Adciona a noticia na lista de fake news;
             votoNFN = 0;
             votoFK = 0;
@@ -343,6 +359,7 @@ public class Controller {
         }
     }
     
+    //Método utilizado para enviar as mensagens no multicast;
     private void comunicaSala(Protocolo p){
         try{
             InetAddress enderecoMulticast = InetAddress.getByName("236.52.65.9");

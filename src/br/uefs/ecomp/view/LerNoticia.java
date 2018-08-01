@@ -199,24 +199,28 @@ public class LerNoticia extends javax.swing.JDialog {
         alert.setVisible(false);
         Noticia n = c.getNoticia(this.idNoticia);
         
+        //Se há suspeita da noticia ser fake news é informado ao usuário uma mensagem que a noticia é suspeita;
         if (c.getSuspeita(this.idNoticia)) {
-            alert.setVisible(true);
+            alert.setVisible(true); //Torna visível a mensagem de alerta;
             alert.setText("Detectamos uma suspeita desta noticia ser falsa. Estamos analisando nossa base de dados a respeito.");
             alert.setForeground(Color.yellow);
             alert.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/atencao.png")));
         }else if (c.getFake(this.idNoticia)) {
-            alert.setVisible(true);
+        //Se a noticia selecionada foi listada como fake news, é informado ao usuário que a mensagem é fn;
+            alert.setVisible(true); //torna visível a mensagem de fake news;
             alert.setText("Esta notícia foi listada como Fake News em nossa base de dados!");
             alert.setForeground(Color.red);
             alert.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/error.png")));
+            
+            //Desabilita os botões de avaliação da noticia;
             avalia.setEnabled(false);
             setAvaliacao.setEnabled(false);
         }
         
-        titulo.setText(n.getTitulo());
-        texto.setText(n.getTexto());
+        titulo.setText(n.getTitulo()); //Seta o titulo da noticia;
+        texto.setText(n.getTexto()); //Seta o texto da noticia;
         float media = (float)n.getNota()/n.getQtdNotas();
-        setAvaliacao.setText(""+format(media));
+        setAvaliacao.setText(""+format(media)); //Seta a média de avaliações que a noticia recebeu;
     }
     
     //Formata o valor Double para 1 ou 2 casas decimais depois da virgula.
@@ -226,6 +230,7 @@ public class LerNoticia extends javax.swing.JDialog {
         return v;
     }
     //------------------------------------------------------------------------//
+    //Slider utilizado para o usuário avaliar a noticia, com mudança de figura na avaliação;
     private void sliderAvaliacaoStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sliderAvaliacaoStateChanged
         avalia.setEnabled(true);
         
